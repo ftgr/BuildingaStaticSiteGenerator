@@ -1,5 +1,6 @@
 import os
 import shutil
+import sys
 
 from generate_page import generate_pages_recursive
 
@@ -34,10 +35,22 @@ def copy_files_recursive(source_dir_path: str, dest_dir_path: str) -> None:
 
 
 def main() -> None:
+    # 1. Capture Base Path from Command Line Args
+    basepath = "/"
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+
+    print(f"Using base path: {basepath}")
+
     # Define our source and destination
     # Senior Engineer Tip: Use absolute paths or reliable relative paths
     source = "static"
-    destination = "public"
+    # destination = "public"
+    # content_source = "content"
+    # template_path = "template.html"
+
+    # 2. Change destination to 'docs' for GitHub Pages
+    destination = "docs"
     content_source = "content"
     template_path = "template.html"
 
@@ -53,7 +66,9 @@ def main() -> None:
     # generate_page("content/index.md", "template.html", "public/index.html")
     # print("Generating content...")
     # This one call handles the entire site now
-    generate_pages_recursive(content_source, template_path, destination)
+    # generate_pages_recursive(content_source, template_path, destination)
+    # 3. Pass basepath to generator
+    generate_pages_recursive(content_source, template_path, destination, basepath)
 
     print("Done!")
 

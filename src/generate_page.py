@@ -3,7 +3,7 @@ import os
 from markdown_blocks import markdown_to_html_node, extract_title
 
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath: str):
     """
     Crawls the content directory and generates HTML pages for every Markdown file found.
     Preserves the directory structure in the destination.
@@ -22,15 +22,17 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
                 dest_html_path = to_path.replace(".md", ".html")
 
                 # Generate the page using our existing logic (refactored or called directly)
-                generate_page(from_path, template_path, dest_html_path)
+                #generate_page(from_path, template_path, dest_html_path)
+                generate_page(from_path, template_path, dest_html_path, basepath)
         else:
             # Recursion Step: It's a directory
             # Ensure the destination directory exists
             os.makedirs(to_path, exist_ok=True)
-            generate_pages_recursive(from_path, template_path, to_path)
+            #generate_pages_recursive(from_path, template_path, to_path)
+            generate_pages_recursive(from_path, template_path, to_path, basepath)
 
 
-def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
+def generate_page(from_path: str, template_path: str, dest_path: str, basepath: str) -> None:
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     # 1. Read the Markdown file
@@ -51,6 +53,11 @@ def generate_page(from_path: str, template_path: str, dest_path: str) -> None:
     # 5. Replace Placeholders
     full_html = template_content.replace("{{ Title }}", title)
     full_html = full_html.replace("{{ Content }}", html_content)
+
+    # Logic to fix links for GitHub Pages deployment
+    # We replace absolute paths like href="/..." with href="{basepath}..."
+    full_html = full_html.replace('href="/', f'href="{basepath}')
+    full_html = full_html.replace('src="/', f'src="{basepath}')
 
     # 6. Ensure the destination directory exists
     dest_dir_path = os.path.dirname(dest_path)
